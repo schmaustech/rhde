@@ -30,15 +30,3 @@
      path: /etc/cron.daily/update-client-config-packages
      state: absent
    notify: clean_dnf
-  
- - name: enable baseos/appstream
-   community.general.rhsm_repository:
-     name: "{{ common_repos }}"
-     state: enabled
-   notify: clean_dnf
-  
- - name: enable fast-dp/ocp
-   community.general.rhsm_repository:
-     name: "{{ extra_repos }}"
-     state: enabled
-   notify: clean_dnf
