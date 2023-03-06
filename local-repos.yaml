@@ -21,12 +21,12 @@
      
    - name: Creating repository Toml file
      copy:
-       dest: "'{{ microshift_local }}'/microshift.toml"
+       dest: "{{ microshift_local }}/microshift.toml"
        content: |
          id = "microshift-local"
          name = "MicroShift local repo"
          type = "yum-baseurl"
-         url = "file://'{{ microshift_local }}'"
+         url = "file://{{ microshift_local }}"
          check_gpg = false
          check_ssl = false
          system = false
