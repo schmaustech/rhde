@@ -19,7 +19,7 @@
        All Interface List: {{ ansible_interfaces }}
        All IP: {{ ansible_all_ipv4_addresses }}
        Gateway: {{ ansible_default_ipv4.gateway }}
-       Eth0 MAC: {{ ansible_eth0.macaddress }}
+       Eth0 MAC: {{ ansible_enp2s0.macaddress }}
      debug:
       msg: "{{ msg.split('\n') }}"
 
