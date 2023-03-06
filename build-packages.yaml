@@ -1,0 +1,29 @@
+---
+ - hosts: all
+   tasks:
+   - name: Install requirements for building the images
+     ansible.builtin.dnf:
+       name:
+         - createrepo
+         - yum-utils 
+         - lorax
+         - skopeo
+         - composer-cli
+         - cockpit-composer
+         - podman 
+         - genisoimage
+         - syslinux
+         - isomd5sum
+       state: latest
+       
+   - name: Enable and start cockpit.socket
+     ansible.builtin.service:
+       name: cockpit.socket
+       enabled: yes
+       state: started
+
+   - name: Enable and start osbuild-composer.socket
+     ansible.builtin.service:
+       name: osbuild-composer.socket
+       enabled: yes
+       state: started
