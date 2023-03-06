@@ -3,30 +3,30 @@
    tasks:
    - name: Create local MicroShift-Fast Datapath repository directory
      ansible.builtin.file:
-       path: {{ microshift_local }}
+       path: "{{ microshift_local }}"
        state: directory
        mode: '0755'
        
    - name: Syncronize the local MicroShift repository
-     shell: reposync --arch=$(uname -i) --arch=noarch --gpgcheck --download-path {{ microshift_local }} --repo=rhocp-4.12-for-rhel-8-x86_64-rpms --repo=fast-datapath-for-rhel-8-x86_64-rpms
+     shell: reposync --arch=$(uname -i) --arch=noarch --gpgcheck --download-path "{{ microshift_local }}" --repo=rhocp-4.12-for-rhel-8-x86_64-rpms --repo=fast-datapath-for-rhel-8-x86_64-rpms
      become: yes
      
    - name: Remove CoreOS packages in repository
-     shell: find {{ microshift_local }} -name \*coreos\* -print -exec rm -f {} \;
+     shell: find "{{ microshift_local }}" -name \*coreos\* -print -exec rm -f {} \;
      become: yes
      
    - name: Create repository 
-     shell: createrepo {{ microshift_local }}
+     shell: createrepo "{{ microshift_local }}"
      become: yes
      
    - name: Creating repository Toml file
      copy:
-       dest: "{{ microshift_local }}/microshift.toml"
+       dest: "'{{ microshift_local }}'/microshift.toml"
        content: |
          id = "microshift-local"
          name = "MicroShift local repo"
          type = "yum-baseurl"
-         url = "file://{{ microshift_local }}"
+         url = "file://'{{ microshift_local }}'"
          check_gpg = false
          check_ssl = false
          system = false
