@@ -1,13 +1,11 @@
-
 ---
-
-- name: register to the customer portal
-  community.general.redhat_subscription:
-    username: "{{ redhat_username }}"
-    password: "{{ redhat_password }}"
-    pool_ids: "{{ pool_id }}"
-  notify:
-    - clean_dnf
+ - name: register to the customer portal
+   community.general.redhat_subscription:
+     username: "{{ redhat_username }}"
+     password: "{{ redhat_password }}"
+     pool_ids: "{{ pool_id }}"
+   notify:
+     - clean_dnf
     
 - name: check if subman can configure repos
   ansible.builtin.shell:
