@@ -30,3 +30,54 @@
          check_gpg = false
          check_ssl = false
          system = false
+         
+   - name: Add local-repository to composer sources
+     shell: composer-cli sources add /var/repos/microshift-local/microshift.toml
+     become: yes
+
+   - name: Creating MicroShift Toml file
+     copy:
+       dest: "{{ microshift_local }}/rhde-microshift.toml"
+       content: |
+         name = "rhde-microshift"
+         description = "RHDE Microshift Image"
+         version = "1.0.0"
+         modules = []
+         groups = []
+
+         [[packages]]
+         name = "microshift"
+         version = "*"
+
+         [[packages]]
+         name = "openshift-clients"
+         version = "*"
+
+         [[packages]]
+         name = "git"
+         version = "*"
+
+         [[packages]]
+         name = "iputils"
+         version = "*"
+
+         [[packages]]
+         name = "bind-utils"
+         version = "*"
+
+         [[packages]]
+         name = "net-tools"
+         version = "*"
+
+         [[packages]]
+         name = "iotop"
+         version = "*"
+
+         [[packages]]
+         name = "redhat-release"
+         version = "*"
+
+         [customizations]
+
+         [customizations.services]
+         enabled = ["microshift"]
