@@ -32,5 +32,5 @@
          system = false
          
    - name: Add local-repository to composer sources
-     shell: composer-cli sources add /var/repos/microshift-local/microshift.toml
+     shell: composer-cli sources add "{{ microshift_local }}"/microshift.toml
      become: yes
