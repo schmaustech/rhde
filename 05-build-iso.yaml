@@ -1,0 +1,6 @@
+---
+ - hosts: all
+   tasks:
+   - name: Generate Installation ISO for MicroShift Image
+     shell: cd "{{ microshift_local }}/generate-iso/"; ./recook.sh
+     become: yes
