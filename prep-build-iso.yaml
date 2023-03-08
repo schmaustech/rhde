@@ -1,99 +1,284 @@
 ---
  - hosts: all
    tasks:
-   - name: Creating MicroShift Toml file
+   - name: Creating isolinux.cfg file
      copy:
-       dest: "{{ microshift_local }}/rhde-microshift.toml"
+       dest: "{{ microshift_local }}/generate-iso/isolinux.cfg"
        content: |
-         name = "rhde-microshift"
-         description = "RHDE Microshift Image"
-         version = "1.0.0"
-         modules = []
-         groups = []
-         [[packages]]
-         name = "microshift"
-         version = "*"
-         [[packages]]
-         name = "openshift-clients"
-         version = "*"
-         [[packages]]
-         name = "git"
-         version = "*"
-         [[packages]]
-         name = "iputils"
-         version = "*"
-         [[packages]]
-         name = "bind-utils"
-         version = "*"
-         [[packages]]
-         name = "net-tools"
-         version = "*"
-         [[packages]]
-         name = "iotop"
-         version = "*"
-         [[packages]]
-         name = "redhat-release"
-         version = "*"
-         [customizations]
-         [customizations.services]
-         enabled = ["microshift"]
-              
-   - name: Push blueprint to composer
-     shell: composer-cli blueprints push "{{ microshift_local }}"/rhde-microshift.toml
-     become: yes
+         default vesamenu.c32
+         timeout 600
 
-   - name: Start compose of blueprint image
-     shell: composer-cli compose start-ostree rhde-microshift rhel-edge-container| cut -f2 -d" "
-     become: yes 
-     register: compose_uuid
+          display boot.msg
+
+          # Clear the screen when exiting the menu, instead of leaving the menu displayed.
+          # For vesamenu, this means the graphical background is still displayed without
+          # the menu itself for as long as the screen remains in graphics mode.
+          menu clear
+          menu background splash.png
+          menu title Red Hat Enterprise Linux 8.7
+          menu vshift 8
+          menu rows 18
+          menu margin 8
+          #menu hidden
+          menu helpmsgrow 15
+          menu tabmsgrow 13
+
+          # Border Area
+          menu color border * #00000000 #00000000 none
+
+          # Selected item
+          menu color sel 0 #ffffffff #00000000 none
+
+          # Title bar
+          menu color title 0 #ff7ba3d0 #00000000 none
+
+          # Press [Tab] message
+          menu color tabmsg 0 #ff3a6496 #00000000 none
+
+          # Unselected menu item
+          menu color unsel 0 #84b8ffff #00000000 none
+
+          # Selected hotkey
+          menu color hotsel 0 #84b8ffff #00000000 none
+
+          # Unselected hotkey
+          menu color hotkey 0 #ffffffff #00000000 none
+
+          # Help text
+          menu color help 0 #ffffffff #00000000 none
+
+          # A scrollbar of some type? Not sure.
+          menu color scrollbar 0 #ffffffff #ff355594 none
+
+          # Timeout msg
+          menu color timeout 0 #ffffffff #00000000 none
+          menu color timeout_msg 0 #ffffffff #00000000 none
+
+          # Command prompt text
+          menu color cmdmark 0 #84b8ffff #00000000 none
+          menu color cmdline 0 #ffffffff #00000000 none
+
+          # Do not display the actual menu unless the user presses a key. All that is displayed is a timeout message.
+
+          menu tabmsg Press Tab for full configuration options on menu items.
+
+          menu separator # insert an empty line
+          menu separator # insert an empty line
+
+          label install
+          menu label ^Zero Touch Provision Red Hat Device Edge
+          kernel vmlinuz
+          append initrd=initrd.img inst.stage2=hd:LABEL=RHEL-8-7-0-BaseOS-x86_64 inst.ks=hd:LABEL=RHEL-8-7-0-BaseOS-x86_64:/ks.cfg quiet
+
+          label check
+          menu label Test this ^media & Zero Touch Provision Red Hat Device Edge
+          menu default
+          kernel vmlinuz
+          append initrd=initrd.img inst.stage2=hd:LABEL=RHEL-8-7-0-BaseOS-x86_64 rd.live.check inst.ks=hd:LABEL=RHEL-8-7-0-BaseOS-x86_64:/ks.cfg quiet
+
+          menu separator # insert an empty line
+
+          # utilities submenu
+          menu begin ^Troubleshooting
+          menu title Troubleshooting
+
+          label vesa
+          menu indent count 5
+          menu label Install Red Hat Enterprise Linux 8.7 in ^basic graphics mode
+          text help
+          Try this option out if you're having trouble installing
+          Red Hat Enterprise Linux 8.7.
+          endtext
+          kernel vmlinuz
+          append initrd=initrd.img inst.stage2=hd:LABEL=RHEL-8-7-0-BaseOS-x86_64 nomodeset quiet
+
+          label rescue
+          menu indent count 5
+          menu label ^Rescue a Red Hat Enterprise Linux system
+          text help
+          If the system will not boot, this lets you access files
+          and edit config files to try to get it booting again.
+          endtext
+          kernel vmlinuz
+          append initrd=initrd.img inst.stage2=hd:LABEL=RHEL-8-7-0-BaseOS-x86_64 inst.rescue quiet
+
+          label memtest
+          menu label Run a ^memory test
+          text help
+          If your system is having issues, a problem with your
+          system's memory may be the cause. Use this utility to
+          see if the memory is working correctly.
+          endtext
+          kernel memtest
+
+          menu separator # insert an empty line
+
+          label local
+          menu label Boot from ^local drive
+          localboot 0xffff
+
+          menu separator # insert an empty line
+          menu separator # insert an empty line
+
+          label returntomain
+          menu label Return to ^main menu
+          menu exit
+
+          menu end
+
+   - name: Creating grub.cfg file
+     copy:
+       dest: "{{ microshift_local }}/generate-iso/grub.cfg"
+       content: |
+         set default="1"
+
+         function load_video {
+           insmod efi_gop
+           insmod efi_uga
+           insmod video_bochs
+           insmod video_cirrus
+           insmod all_video
+         }
+
+         load_video
+         set gfxpayload=keep
+         insmod gzio
+         insmod part_gpt
+         insmod ext2
+
+         set timeout=10
+         ### END /etc/grub.d/00_header ###
+
+         search --no-floppy --set=root -l 'RHEL-8-7-0-BaseOS-x86_64'
+
+         ### BEGIN /etc/grub.d/10_linux ###
+         menuentry 'Zero Touch Provision Red Hat Device Edge' --class fedora --class gnu-linux --class gnu --class os {
+         linuxefi /images/pxeboot/vmlinuz inst.stage2=hd:LABEL=RHEL-8-7-0-BaseOS-x86_64 inst.ks=hd:LABEL=RHEL-8-7-0-BaseOS-x86_64:/ks.cfg quiet
+         initrdefi /images/pxeboot/initrd.img
+         }
+         menuentry 'Test this media & Zero Touch Provision Red Hat Device Edge' --class fedora --class gnu-linux --class gnu --class os {
+         linuxefi /images/pxeboot/vmlinuz inst.stage2=hd:LABEL=RHEL-8-7-0-BaseOS-x86_64 rd.live.check inst.ks=hd:LABEL=RHEL-8-7-0-BaseOS-x86_64:/ks.cfg quiet
+         initrdefi /images/pxeboot/initrd.img
+         }
+         submenu 'Troubleshooting -->' {
+         menuentry 'Install Red Hat Enterprise Linux 8.7 in basic graphics mode' --class fedora --class gnu-linux --class gnu --class os {
+         linuxefi /images/pxeboot/vmlinuz inst.stage2=hd:LABEL=RHEL-8-7-0-BaseOS-x86_64 nomodeset quiet
+         initrdefi /images/pxeboot/initrd.img
+         }
+         menuentry 'Rescue a Red Hat Enterprise Linux system' --class fedora --class gnu-linux --class gnu --class os {
+         linuxefi /images/pxeboot/vmlinuz inst.stage2=hd:LABEL=RHEL-8-7-0-BaseOS-x86_64 inst.rescue quiet
+         initrdefi /images/pxeboot/initrd.img
+         }
+         }
+
+   - name: Creating ks.cfg file
+     copy:
+       dest: "{{ microshift_local }}/generate-iso/ks.cfg"
+       content: |
+         network  --bootproto=dhcp --device=enp1s0 --onboot=off --ipv6=auto 
+         network  --bootproto=dhcp --device=enp2s0 --onboot=on --ipv6=auto --activate
+         keyboard --xlayouts='us'
+         lang en_US.UTF-8
+         timezone America/Chicago --isUtc
+         zerombr
+         ignoredisk --only-use=sda
+         clearpart --all --initlabel
+         part /boot/efi --size 512 --asprimary --fstype=vfat --ondrive=sda
+         part /boot --size 1024 --asprimary --fstype=xfs --ondrive=sda
+         part pv.2 --size 1 --grow --fstype=xfs --ondrive=sda
+         volgroup rhel --pesize=32768 pv.2
+         logvol / --fstype xfs --vgname rhel --size=98304 --name=root
+         reboot
+         text
+         rootpw --iscrypted $6$JDSTC2MKBr35O1SM$ZKHoLV29XAoOITHKj00HnKSJ9AUFDgCeM9UY4907dBsy9ICZNTYjsYLf/VjGmOvE422gBwQZwevN/1vB6mBSl1
+         user --groups=wheel --name=bschmaus --password=$6$taTBd76gNB99NquE$RON0n03WXShKLYc1eLIYZUuWln0H9Q0MadBkEDtCKFGs.gA8SnimPwK03YkkNMYDXVJOL.7jIfUd7Mg6mtyaD0 --iscrypted --gecos="bschmaus"
+         services --enabled=ostree-remount
+         ostreesetup --nogpg --url=file:///run/install/repo/ostree/repo --osname=rhel --ref=rhel/8/x86_64/edge
+
+         %post --log=/var/log/anaconda/post-install.log --erroronfail
+
+         echo -e 'bschmaus\tALL=(ALL)\tNOPASSWD: ALL' >> /etc/sudoers
+
+         mkdir -p /etc/crio
+         cat > /etc/crio/openshift-pull-secret << EOF
+         {{ pull_secret_key }}
+         EOF
+         chmod 600 /etc/crio/openshift-pull-secret
+
+         firewall-offline-cmd --zone=trusted --add-source=10.42.0.0/16
+         firewall-offline-cmd --zone=trusted --add-source=169.254.169.1
+         firewall-offline-cmd --zone=public --add-port=6443/tcp
+         firewall-offline-cmd --zone=public --add-port=80/tcp
+         firewall-offline-cmd --zone=public --add-port=443/tcp
+
+         %end
+
+ 
+   - name: Creating recook file
+     copy:
+       dest: "{{ microshift_local }}/generate-iso/recook.sh"
+       content: |    
+         #!/bin/bash
+
+         # Ensure this script is run as root
+         if [ "$EUID" != "0" ]; then
+             echo "Please run as root" >&2
+             exit 1
+         fi
+
+         # Set a few bash options
+         cd "$(dirname "$(realpath "$0")")"
+         set -ex
+
+         # Create a temp dir
+         tmp=$(mktemp -d)
+         mkdir "$tmp/iso"
+
+         # Mount the boot iso into our temp dir
+         mount rhel-8.7-x86_64-boot.iso "$tmp/iso"
+
+         # Create a directory for our new ISO
+         mkdir "$tmp/new"
+
+         # Copy the contents of the boot ISO to our new directory
+         cp -a "$tmp/iso/" "$tmp/new/"
+
+         # Unmount the boot ISO
+         umount "$tmp/iso"
+
+         # Copy our customized files into the new ISO directory
+         cp ks.cfg "$tmp/new/iso/"
+         cp isolinux.cfg "$tmp/new/iso/isolinux/"
+         cp grub.cfg "$tmp/new/iso/EFI/BOOT/"
+         cp -r ostree "$tmp/new/iso/"
+
+         # Push directory of new ISO for later commands
+         pushd "$tmp/new/iso"
+
+         # Create our new ISO
+         mkisofs -o ../rhde-ztp.iso -b isolinux/isolinux.bin -J -R -l \
+             -c isolinux/boot.cat -no-emul-boot -boot-load-size 4 -boot-info-table -eltorito-alt-boot \
+             -e images/efiboot.img -no-emul-boot -graft-points -joliet-long -V "RHEL-8-7-0-BaseOS-x86_64" . 
+         isohybrid --uefi ../rhde-ztp.iso
+         implantisomd5 ../rhde-ztp.iso
+
+         # Return to previous directory
+         popd
+
+         # Cleanup and give user ownership of ISO
+         mv "$tmp/new/rhde-ztp.iso" ./
+         rm -rf "$tmp"
+         chown $(stat -c '%U:%G' .) ./rhde-ztp.iso
+
      
-   - set_fact: 
-       compose_uuid={{ compose_uuid.stdout }}
-     
-   - name: Print UUID
-     debug:
-       msg: "UUID: {{ compose_uuid }}"
-        
-   - name: Check for compose to be completed
-     shell: composer-cli compose status | grep "{{ compose_uuid }}" | cut -f2 -d" "
-     register: compose_state
-     until: '"FINISHED" in compose_state.stdout'
-     retries: 24
-     delay: 300
-     become: yes
-     
-   - name: Create ostree framework directory
+   - name: Change file ownership, group and permissions
      ansible.builtin.file:
-       path: "{{ microshift_local }}/generate-iso/ostree"
-       state: directory
-       mode: '0755'
-     
-   - name: Download composed image tar file
-     shell: composer-cli compose image "{{ compose_uuid }}"
-     register: compose_image
+       path: "{{ microshift_local }}/generate-iso/recook.sh"
+       owner: root
+       group: root
+       mode: '0755'     
+       
+   - name: SCP Over RHEL ISO
+     shell: scp root@192.168.0.22:/var/lib/libvirt/images/rhel-8.7-x86_64-boot.iso "{{ microshift_local }}/generate-iso/"
      become: yes
-
-   - set_fact: 
-       compose_image={{ compose_image.stdout }}
-     
-   - name: Skopeo copy the compose archive into local containers store
-     shell: skopeo copy oci-archive:"{{ compose_image }}" containers-storage:localhost/rhde-microshift:latest
-     become: yes
-     
-   - name: Run rhde-microshift container
-     containers.podman.podman_container:
-       name: rhde-microshift
-       image: localhost/rhde-microshift:latest
-       state: started
-       ports:
-           - "8000:8080"
-           
-   - name: Start compose of blueprint image
-     shell: podman cp rhde-microshift:/usr/share/nginx/html/repo "{{ microshift_local }}/generate-iso/ostree"
-     become: yes 
-
-   - name: Stop rhde-microshift container
-     containers.podman.podman_container:
-       name: rhde-microshift
-       state: stopped
        
