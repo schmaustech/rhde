@@ -47,6 +47,9 @@
      become: yes 
      register: compose_uuid
      
+   - set_fact: 
+       compose_uuid={{ compose_uuid.stdout }
+     
    - name: Print UUID
      debug:
        msg: "UUID: {{ compose_uuid }}"
@@ -55,6 +58,9 @@
      shell: composer-cli compose status | grep "{{ compose_uuid }}" | cut -f2 -d" "
      register: result
      become: yes
+     
+   - set_fact: 
+       result={{ result.stdout }
      
    - name: Print result
      debug:
