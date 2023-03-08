@@ -48,7 +48,7 @@
      register: compose_uuid
      
    - set_fact: 
-       compose_uuid={{ compose_uuid.stdout }
+       compose_uuid={{ compose_uuid.stdout }}
      
    - name: Print UUID
      debug:
@@ -60,7 +60,7 @@
      become: yes
      
    - set_fact: 
-       result={{ result.stdout }
+       result={{ result.stdout }}
      
    - name: Print result
      debug:
