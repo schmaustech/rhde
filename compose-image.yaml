@@ -74,7 +74,7 @@
      delay: 300
      become: yes
      
-    - name: Create ostree framework directory
+   - name: Create ostree framework directory
      ansible.builtin.file:
        path: "{{ microshift_local }}"/generate-iso/ostree
        state: directory
