@@ -74,5 +74,38 @@
      delay: 300
      become: yes
      
+    - name: Create ostree framework directory
+     ansible.builtin.file:
+       path: "{{ microshift_local }}"/generate-iso/ostree
+       state: directory
+       mode: '0755'
      
+   - name: Download composed image tar file
+     shell: composer-cli compose image "{{ compose_uuid }}"
+     register: compose_image
+     become: yes
+
+   - set_fact: 
+       compose_image={{ compose_image.stdout }}
+     
+   - name: Skopeo copy the compose archive into local containers store
+     shell: skopeo copy oci-archive:"{{ compose_image }}" containers-storage:localhost/rhde-microshift:latest
+     become: yes
+     
+   - name: Run rhde-microshift container
+     containers.podman.podman_container:
+       name: rhde-microshift
+       image: localhost/rhde-microshift:latest
+       state: started
+       ports:
+           - "8000:8080"
+           
+   - name: Start compose of blueprint image
+     shell: podman cp rhde-microshift:/usr/share/nginx/html/repo "{{ microshift_local }}"/generate-iso/ostree
+     become: yes 
+
+   - name: Stop rhde-microshift container
+     containers.podman.podman_container:
+       name: rhde-microshift
+       state: stopped    
      
