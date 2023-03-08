@@ -201,7 +201,7 @@
 
          mkdir -p /etc/crio
          cat > /etc/crio/openshift-pull-secret << EOF
-         {{ pull_secret_key }}
+         "{{ pull_secret_key }}"
          EOF
          chmod 600 /etc/crio/openshift-pull-secret
 
