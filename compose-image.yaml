@@ -49,8 +49,8 @@
      
    - name: Print compose uuid
      ansible.builtin.debug:
-     var: compose_uuid
-     verbosity: 2
+       var: compose_uuid
+       verbosity: 2
      
    - name: Check for compose to be completed
      shell: composer-cli compose status | grep "{{ compose_uuid }}" | cut -f2 -d" "
@@ -59,8 +59,8 @@
      
    - name: Print result 
      ansible.builtin.debug:
-     var: result
-     verbosity: 2
+       var: result
+       verbosity: 2
      
    - name: Check for compose to be completed
      shell: composer-cli compose status | grep "{{ compose_uuid }}" | cut -f2 -d" "
