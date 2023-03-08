@@ -48,7 +48,7 @@
      register: compose_uuid
      
    - name: Check for compose to be completed
-     shell: composer-cli compose status | grep "{{ compose_uuid }}"
+     shell: composer-cli compose status | grep "{{ compose_uuid }}" | cut -f2 -d" "
      register: result
      until: result.stdout.find("FINISHED") != -1
      retries: 24
