@@ -64,7 +64,7 @@
      
    - name: Create ostree framework directory
      ansible.builtin.file:
-       path: "{{ microshift_local }}"/generate-iso/ostree
+       path: "{{ microshift_local }}/generate-iso/ostree"
        state: directory
        mode: '0755'
      
@@ -89,7 +89,7 @@
            - "8000:8080"
            
    - name: Start compose of blueprint image
-     shell: podman cp rhde-microshift:/usr/share/nginx/html/repo "{{ microshift_local }}"/generate-iso/ostree
+     shell: podman cp rhde-microshift:/usr/share/nginx/html/repo "{{ microshift_local }}/generate-iso/ostree"
      become: yes 
 
    - name: Stop rhde-microshift container
