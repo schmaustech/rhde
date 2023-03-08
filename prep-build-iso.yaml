@@ -1,1 +1,99 @@
+---
+ - hosts: all
+   tasks:
+   - name: Creating MicroShift Toml file
+     copy:
+       dest: "{{ microshift_local }}/rhde-microshift.toml"
+       content: |
+         name = "rhde-microshift"
+         description = "RHDE Microshift Image"
+         version = "1.0.0"
+         modules = []
+         groups = []
+         [[packages]]
+         name = "microshift"
+         version = "*"
+         [[packages]]
+         name = "openshift-clients"
+         version = "*"
+         [[packages]]
+         name = "git"
+         version = "*"
+         [[packages]]
+         name = "iputils"
+         version = "*"
+         [[packages]]
+         name = "bind-utils"
+         version = "*"
+         [[packages]]
+         name = "net-tools"
+         version = "*"
+         [[packages]]
+         name = "iotop"
+         version = "*"
+         [[packages]]
+         name = "redhat-release"
+         version = "*"
+         [customizations]
+         [customizations.services]
+         enabled = ["microshift"]
+              
+   - name: Push blueprint to composer
+     shell: composer-cli blueprints push "{{ microshift_local }}"/rhde-microshift.toml
+     become: yes
 
+   - name: Start compose of blueprint image
+     shell: composer-cli compose start-ostree rhde-microshift rhel-edge-container| cut -f2 -d" "
+     become: yes 
+     register: compose_uuid
+     
+   - set_fact: 
+       compose_uuid={{ compose_uuid.stdout }}
+     
+   - name: Print UUID
+     debug:
+       msg: "UUID: {{ compose_uuid }}"
+        
+   - name: Check for compose to be completed
+     shell: composer-cli compose status | grep "{{ compose_uuid }}" | cut -f2 -d" "
+     register: compose_state
+     until: '"FINISHED" in compose_state.stdout'
+     retries: 24
+     delay: 300
+     become: yes
+     
+   - name: Create ostree framework directory
+     ansible.builtin.file:
+       path: "{{ microshift_local }}"/generate-iso/ostree
+       state: directory
+       mode: '0755'
+     
+   - name: Download composed image tar file
+     shell: composer-cli compose image "{{ compose_uuid }}"
+     register: compose_image
+     become: yes
+
+   - set_fact: 
+       compose_image={{ compose_image.stdout }}
+     
+   - name: Skopeo copy the compose archive into local containers store
+     shell: skopeo copy oci-archive:"{{ compose_image }}" containers-storage:localhost/rhde-microshift:latest
+     become: yes
+     
+   - name: Run rhde-microshift container
+     containers.podman.podman_container:
+       name: rhde-microshift
+       image: localhost/rhde-microshift:latest
+       state: started
+       ports:
+           - "8000:8080"
+           
+   - name: Start compose of blueprint image
+     shell: podman cp rhde-microshift:/usr/share/nginx/html/repo "{{ microshift_local }}"/generate-iso/ostree
+     become: yes 
+
+   - name: Stop rhde-microshift container
+     containers.podman.podman_container:
+       name: rhde-microshift
+       state: stopped
+       
