@@ -37,5 +37,23 @@
          [customizations]
          [customizations.services]
          enabled = ["microshift"]
-         
-         
+              
+   - name: Push blueprint to composer
+     shell: composer-cli blueprints push "{{ microshift_local }}"/rhde-microshift.toml
+     become: yes
+
+   - name: Start compose of blueprint image
+     shell: composer-cli compose start-ostree rhde-microshift rhel-edge-container| cut -f2 -d" "
+     become: yes 
+     register: compose_uuid
+     
+   - name: Check for compose to be completed
+     shell: composer-cli compose status | grep "{{ compose_uuid }}"
+     register: result
+     until: result.stdout.find("FINISHED") != -1
+     retries: 24
+     delay: 300
+     become: yes
+     
+     
+     
