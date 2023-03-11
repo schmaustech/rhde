@@ -85,11 +85,11 @@
                        password: password
                        chpasswd: { expire: False }
                    name: cloudinitdisk
-
-    - name: Login to OpenShift
-      ansible.builtin.shell:
-        cmd: oc login --server={{ clusterendpoint }} -u {{ username }} -p {{ password }} --insecure-skip-tls-verify
+                   
+   - name: Login to OpenShift
+     ansible.builtin.shell:
+       cmd: oc login --server={{ clusterendpoint }} -u {{ username }} -p {{ password }} --insecure-skip-tls-verify
       
-    - name:
-      ansible.builtin.shell:
-        cmd: oc create -f ~/test-vm.yaml
+   - name:
+     ansible.builtin.shell:
+       cmd: oc create -f ~/test-vm.yaml
