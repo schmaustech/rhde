@@ -1,7 +1,7 @@
 ---
  - hosts: localhost
    tasks:
-   - name: Creating isolinux.cfg file
+   - name: Creating Virtual Machine Custom Resource File
      copy:
        dest: "~/test-vm.yaml"
        content: |
@@ -81,6 +81,7 @@
                  - cloudInitNoCloud:
                      userData: |-
                        #cloud-config
+                       disable_root: false
                        user: root
                        password: password
                        chpasswd: { expire: False }
