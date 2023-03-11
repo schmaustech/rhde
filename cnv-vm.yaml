@@ -81,7 +81,7 @@
                  - cloudInitNoCloud:
                      userData: |-
                        #cloud-config
-                       user: cloud-user
+                       user: root
                        password: password
                        chpasswd: { expire: False }
                    name: cloudinitdisk
