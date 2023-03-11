@@ -1,4 +1,95 @@
 ---
- - hosts: all
+ - hosts: localhost
    tasks:
    - name: Creating isolinux.cfg file
+     copy:
+       dest: "~/test-vm.yaml"
+       content: |
+         apiVersion: kubevirt.io/v1
+         kind: VirtualMachine
+         metadata:
+           name: test
+           namespace: default
+           labels:
+             app: test
+             vm.kubevirt.io/template: rhel8-server-small
+             vm.kubevirt.io/template.namespace: openshift
+             vm.kubevirt.io/template.revision: '1'
+             vm.kubevirt.io/template.version: v0.24.2
+         spec:
+           dataVolumeTemplates:
+             - apiVersion: cdi.kubevirt.io/v1beta1
+               kind: DataVolume
+               metadata:
+                 creationTimestamp: null
+                 name: test
+               spec:
+                 source:
+                   pvc:
+                     name: rhel8-b0bacbb4e426
+                     namespace: openshift-virtualization-os-images
+                 storage:
+                   resources:
+                     requests:
+                       storage: 30Gi
+           running: true
+           template:
+             metadata:
+               annotations:
+                 vm.kubevirt.io/flavor: small
+                 vm.kubevirt.io/os: rhel8
+                 vm.kubevirt.io/workload: server
+               creationTimestamp: null
+               labels:
+                 kubevirt.io/domain: test
+                 kubevirt.io/size: small
+             spec:
+               domain:
+                 cpu:
+                   cores: 1
+                   sockets: 1
+                   threads: 1
+                 devices:
+                   disks:
+                     - disk:
+                         bus: virtio
+                       name: rootdisk
+                     - disk:
+                         bus: virtio
+                       name: cloudinitdisk
+                   interfaces:
+                     - macAddress: '02:0d:9b:00:00:08'
+                       masquerade: {}
+                       model: virtio
+                       name: default
+                   networkInterfaceMultiqueue: true
+                   rng: {}
+                 machine:
+                   type: pc-q35-rhel8.6.0
+                 resources:
+                   requests:
+                     memory: 2Gi
+               evictionStrategy: LiveMigrate
+               networks:
+                 - name: default
+                   pod: {}
+               terminationGracePeriodSeconds: 180
+               volumes:
+                 - dataVolume:
+                     name: test
+                   name: rootdisk
+                 - cloudInitNoCloud:
+                     userData: |-
+                       #cloud-config
+                       user: cloud-user
+                       password: password
+                       chpasswd: { expire: False }
+                   name: cloudinitdisk
+
+    - name: Login to OpenShift
+      ansible.builtin.shell:
+        cmd: oc login --server={{ clusterendpoint }} -u {{ username }} -p {{ password }} --insecure-skip-tls-verify
+      
+    - name:
+      ansible.builtin.shell:
+        cmd: oc create -f ~/test-vm.yaml
