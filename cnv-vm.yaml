@@ -1,5 +1,12 @@
 ---
  - hosts: localhost
+   module_defaults:
+    ansible.builtin.uri:
+      user: admin
+      Password: {{ admin_password }}
+      force_basic_auth: yes
+      validate_certs: no
+      
    tasks:
    - name: Creating Virtual Machine Custom Resource File
      copy:
