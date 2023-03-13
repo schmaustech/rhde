@@ -109,3 +109,33 @@
    - name:
      ansible.builtin.shell:
        cmd: oc create -f ~/test-vm.yaml
+       
+   - name: Sleep for Virtual Machine Spin Up
+     ansible.builtin.shell:
+       cmd: sleep 300
+
+   - name: find the id of {{ controller_inventory }}
+     ansible.builtin.uri:
+       url: "{{ controller_url }}/inventories?name={{ controller_inventory | regex_replace(' ', '%20') }}"
+     register: controller_inventory_lookup
+     
+   - name: set inventory id fact
+     ansible.builtin.set_fact:
+       controller_inventory_id: "{{ controller_inventory_lookup.json.results[0].id }}"
+       
+   - name: create host in inventory {{ controller_inventory }}
+     ansible.builtin.uri:
+       url: "{{ controller_url }}/inventories/{{ controller_inventory_id }}/hosts/"
+       method: POST
+       body_format: json
+       body:
+         name: "edge-{{ ansible_default_ipv4.macaddress | replace(':','') }}"
+         variables:
+           'ansible_host: {{ ansible_default_ipv4.address }}'
+     register: create_host
+     changed_when:
+       - create_host.status | int == 201
+     failed_when:
+       - create_host.status | int != 201
+       - "'already exists' not in create_host.content"
+       
