@@ -121,8 +121,20 @@
        
    - name: Sleep for Virtual Machine Spin Up
      ansible.builtin.shell:
-       cmd: sleep 300
-
+       cmd: sleep 100
+       
+   - name: Get Virtual Machine IP
+     ansible.builtin.shell:
+       cmd: oc get vmi -A|grep test | awk {'print $5'}
+       register: ipaddress
+       
+    - set_fact: 
+        ipaddress={{ ipaddress.stdout }}
+        
+   - name: Print Virtual Machine IP
+     debug:
+       msg: "VM IPaddress: {{ ipaddress }}"
+       
    - name: find the id of {{ controller_inventory }}
      ansible.builtin.uri:
        url: "{{ controller_url }}/inventories?name={{ controller_inventory | regex_replace(' ', '%20') }}"
@@ -138,9 +150,9 @@
        method: POST
        body_format: json
        body:
-         name: "edge-{{ ansible_default_ipv4.macaddress | replace(':','') }}"
+         name: "edge-{{ ipaddress | replace(':','') }}"
          variables:
-           'ansible_host: {{ ansible_default_ipv4.address }}'
+           'ansible_host: {{ ipaddress }}'
      register: create_host
      changed_when:
        - create_host.status | int == 201
