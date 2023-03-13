@@ -128,8 +128,8 @@
        cmd: oc get vmi -A|grep test | awk {'print $5'}
        register: ipaddress
        
-    - set_fact: 
-        ipaddress={{ ipaddress.stdout }}
+   - set_fact: 
+       ipaddress={{ ipaddress.stdout }}
         
    - name: Print Virtual Machine IP
      debug:
