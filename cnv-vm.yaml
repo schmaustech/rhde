@@ -62,6 +62,10 @@
                        masquerade: {}
                        model: virtio
                        name: default
+                     - bridge: {}
+                       macAddress: '02:0d:9b:00:00:01'
+                       model: virtio
+                       name: nic1
                    networkInterfaceMultiqueue: true
                    rng: {}
                  machine:
@@ -73,6 +77,9 @@
                networks:
                  - name: default
                    pod: {}
+                 - multus:
+                     networkName: br-ext
+                   name: nic1
                terminationGracePeriodSeconds: 180
                volumes:
                  - dataVolume:
@@ -81,10 +88,19 @@
                  - cloudInitNoCloud:
                      userData: |-
                        #cloud-config
-                       disable_root: false
-                       user: root
+                       user: cloud-user
                        password: password
                        chpasswd: { expire: False }
+                     networkData: |
+                        version: 2
+                        ethernets:
+                          eth1: 
+                          addresses:
+                            - 192.168.1.50/24
+                          gateway4:
+                            - 192.168.1.1
+                          nameserver:
+                            - 192.168.0.10
                    name: cloudinitdisk
                    
    - name: Login to OpenShift
