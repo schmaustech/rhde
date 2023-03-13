@@ -125,7 +125,7 @@
        
    - name: Get Virtual Machine IP
      ansible.builtin.shell:
-       cmd: oc get vmi -A|grep test | awk {'print $5'}
+       shell: oc get vmi -A|grep test | awk '{ print $5 }'
        register: ipaddress
        
    - set_fact: 
