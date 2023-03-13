@@ -92,15 +92,12 @@
                        password: password
                        chpasswd: { expire: False }
                      networkData: |
-                        version: 2
-                        ethernets:
-                          enp2s0: 
-                          addresses:
-                            - 192.168.1.50/24
-                          gateway4:
-                            - 192.168.1.1
-                          nameserver:
-                            - 192.168.0.10
+                       version: 2
+                       ethernets:
+                         eth1: 
+                            addresses: [ 192.168.1.50/24 ]
+                            gateway4: [ 192.168.1.1 ]
+                            nameserver: [ 192.168.0.10 ]
                    name: cloudinitdisk
                    
    - name: Login to OpenShift
