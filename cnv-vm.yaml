@@ -94,7 +94,7 @@
                      networkData: |
                         version: 2
                         ethernets:
-                          eth1: 
+                          enp2s0: 
                           addresses:
                             - 192.168.1.50/24
                           gateway4:
