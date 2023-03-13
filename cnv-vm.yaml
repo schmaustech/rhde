@@ -112,21 +112,17 @@
                    name: cloudinitdisk
                    
    - name: Login to OpenShift
-     ansible.builtin.shell:
-       cmd: oc login --server={{ clusterendpoint }} -u {{ username }} -p {{ password }} --insecure-skip-tls-verify
+     shell: oc login --server={{ clusterendpoint }} -u {{ username }} -p {{ password }} --insecure-skip-tls-verify
       
-   - name:
-     ansible.builtin.shell:
-       cmd: oc create -f ~/test-vm.yaml
+   - name: Create Virtual Machine in OpenShift
+     shell: oc create -f ~/test-vm.yaml
        
    - name: Sleep for Virtual Machine Spin Up
-     ansible.builtin.shell:
-       cmd: sleep 100
+     shell: sleep 100
        
    - name: Get Virtual Machine IP
-     ansible.builtin.shell:
-       shell: oc get vmi -A|grep test | awk '{ print $5 }'
-       register: ipaddress
+     shell: oc get vmi -A|grep test | awk '{ print $5 }'
+     register: ipaddress
        
    - set_fact: 
        ipaddress={{ ipaddress.stdout }}
