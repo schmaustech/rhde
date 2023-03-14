@@ -281,7 +281,7 @@
        mode: '0755'   
      become: true
        
-   - name: SCP Over RHEL ISO
+   - name: SCP Over RHEL ISO (###Move this to a http server because with dynamic VM the scp will require keys)
      shell: scp root@192.168.0.22:/var/lib/libvirt/images/rhel-8.7-x86_64-boot.iso "{{ microshift_local }}/generate-iso/"
      become: true
        
