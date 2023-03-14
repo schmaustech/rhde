@@ -125,6 +125,7 @@
           menu exit
 
           menu end
+     become: true
 
    - name: Creating grub.cfg file
      copy:
@@ -170,7 +171,8 @@
          initrdefi /images/pxeboot/initrd.img
          }
          }
-
+     become: true
+     
    - name: Creating ks.cfg file
      copy:
        dest: "{{ microshift_local }}/generate-iso/ks.cfg"
@@ -212,7 +214,7 @@
          firewall-offline-cmd --zone=public --add-port=443/tcp
 
          %end
-
+     become: true
  
    - name: Creating recook file
      copy:
@@ -269,14 +271,15 @@
          mv "$tmp/new/rhde-ztp.iso" ./
          rm -rf "$tmp"
          chown $(stat -c '%U:%G' .) ./rhde-ztp.iso
-
+     become: true
      
    - name: Change file ownership, group and permissions
      ansible.builtin.file:
        path: "{{ microshift_local }}/generate-iso/recook.sh"
        owner: root
        group: root
-       mode: '0755'     
+       mode: '0755'   
+     become: true
        
    - name: SCP Over RHEL ISO
      shell: scp root@192.168.0.22:/var/lib/libvirt/images/rhel-8.7-x86_64-boot.iso "{{ microshift_local }}/generate-iso/"
