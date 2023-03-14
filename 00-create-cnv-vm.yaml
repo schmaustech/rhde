@@ -2,8 +2,8 @@
  - hosts: localhost
    module_defaults:
     ansible.builtin.uri:
-      user: admin
-      password: "{{ admin_password }}"
+      user: "{{ controller_user }}"
+      password: "{{ controller_password }}"
       force_basic_auth: yes
       validate_certs: no
       
