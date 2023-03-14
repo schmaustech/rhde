@@ -10,15 +10,15 @@
        
    - name: Syncronize the local MicroShift repository
      shell: reposync --arch=$(uname -i) --arch=noarch --gpgcheck --download-path "{{ microshift_local }}" --repo=rhocp-4.12-for-rhel-8-x86_64-rpms --repo=fast-datapath-for-rhel-8-x86_64-rpms
-     become: yes
+     become: true
      
    - name: Remove CoreOS packages in repository
      shell: find "{{ microshift_local }}" -name \*coreos\* -print -exec rm -f {} \;
-     become: yes
+     become: true
      
    - name: Create repository 
      shell: createrepo "{{ microshift_local }}"
-     become: yes
+     become: true
      
    - name: Creating repository Toml file
      copy:
@@ -35,4 +35,4 @@
          
    - name: Add local-repository to composer sources
      shell: composer-cli sources add "{{ microshift_local }}"/microshift.toml
-     become: yes
+     become: true
