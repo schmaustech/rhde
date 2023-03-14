@@ -6,6 +6,7 @@
        path: "{{ microshift_local }}"
        state: directory
        mode: '0755'
+     become: true
        
    - name: Syncronize the local MicroShift repository
      shell: reposync --arch=$(uname -i) --arch=noarch --gpgcheck --download-path "{{ microshift_local }}" --repo=rhocp-4.12-for-rhel-8-x86_64-rpms --repo=fast-datapath-for-rhel-8-x86_64-rpms
@@ -30,6 +31,7 @@
          check_gpg = false
          check_ssl = false
          system = false
+     become: true
          
    - name: Add local-repository to composer sources
      shell: composer-cli sources add "{{ microshift_local }}"/microshift.toml
