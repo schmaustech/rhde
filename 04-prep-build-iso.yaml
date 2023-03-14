@@ -283,5 +283,5 @@
        
    - name: SCP Over RHEL ISO
      shell: scp root@192.168.0.22:/var/lib/libvirt/images/rhel-8.7-x86_64-boot.iso "{{ microshift_local }}/generate-iso/"
-     become: yes
+     become: true
        
