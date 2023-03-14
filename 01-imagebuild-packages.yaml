@@ -15,15 +15,18 @@
          - syslinux
          - isomd5sum
        state: latest
+     become: true
        
    - name: Enable and start cockpit.socket
      ansible.builtin.service:
        name: cockpit.socket
        enabled: yes
        state: started
+     become: true
 
    - name: Enable and start osbuild-composer.socket
      ansible.builtin.service:
        name: osbuild-composer.socket
        enabled: yes
        state: started
+     become: true
