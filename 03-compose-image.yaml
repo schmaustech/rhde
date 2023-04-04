@@ -34,6 +34,39 @@
          [[packages]]
          name = "redhat-release"
          version = "*"
+         [[packages]]
+         name = "aide"
+         version = "*"
+         [[packages]]
+         name = "authselect"
+         version = "*"
+         [[packages]]
+         name = "fapolicyd"
+         version = "*"
+         [[packages]]
+         name = "gnutls-utils"
+         version = "*"
+         [[packages]]
+         name = "libreswan"
+         version = "*"
+         [[packages]]
+         name = "opensc"
+         version = "*"
+         [[packages]]
+         name = "postfix"
+         version = "*"
+         [[packages]]
+         name = "rng-tools"
+         version = "*"
+         [[packages]]
+         name = "rsyslog"
+         version = "*"
+         [[packages]]
+         name = "rsyslog-gnutls"
+         version = "*"
+         [[packages]]
+         name = "scap-security-guide"
+         version = "*"
          [customizations]
          [customizations.services]
          enabled = ["microshift"]
