@@ -154,7 +154,7 @@
 
          ### BEGIN /etc/grub.d/10_linux ###
          menuentry 'Zero Touch Provision Red Hat Device Edge' --class fedora --class gnu-linux --class gnu --class os {
-         linuxefi /images/pxeboot/vmlinuz inst.stage2=hd:LABEL=RHEL-8-7-0-BaseOS-x86_64 inst.ks=hd:LABEL=RHEL-8-7-0-BaseOS-x86_64:/ks.cfg quiet
+         linuxefi /images/pxeboot/vmlinuz inst.stage2=hd:LABEL=RHEL-8-7-0-BaseOS-x86_64 inst.ks=hd:LABEL=RHEL-8-7-0-BaseOS-x86_64:/ks.cfg fips=1 quiet
          initrdefi /images/pxeboot/initrd.img
          }
          menuentry 'Test this media & Zero Touch Provision Red Hat Device Edge' --class fedora --class gnu-linux --class gnu --class os {
@@ -183,11 +183,12 @@
          lang en_US.UTF-8
          timezone America/Chicago --isUtc
          zerombr
+         bootloader --location mbr --append "fips=1"
          ignoredisk --only-use=sda
          clearpart --all --initlabel
          part /boot/efi --size 512 --asprimary --fstype=vfat --ondrive=sda
          part /boot --size 1024 --asprimary --fstype=xfs --ondrive=sda
-         part pv.2 --size 1 --grow --fstype=xfs --ondrive=sda
+         part pv.2 --size 1 --grow --fstype=xfs --ondrive=sda --encrypted --cipher=aes-cbc-essiv:sha256 --passphrase=kickstart
          volgroup rhel --pesize=32768 pv.2
          logvol / --fstype xfs --vgname rhel --size=98304 --name=root
          reboot
