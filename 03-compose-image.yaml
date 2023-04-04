@@ -103,7 +103,7 @@
            - "8000:8080"
      become: true
            
-   - name: Start compose of blueprint image
+   - name: Copy image contents from rhde-container to local filesystem
      shell: podman cp rhde-microshift:/usr/share/nginx/html/repo "{{ microshift_local }}/generate-iso/ostree"
      become: true 
 
