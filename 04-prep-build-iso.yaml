@@ -237,7 +237,7 @@
          mkdir "$tmp/iso"
 
          # Mount the boot iso into our temp dir
-         mount rhel-8.7-x86_64-boot.iso "$tmp/iso"
+         mount "{{ image_name }}" "$tmp/iso"
 
          # Create a directory for our new ISO
          mkdir "$tmp/new"
@@ -281,7 +281,7 @@
        mode: '0755'   
      become: true
        
-   - name: SCP Over RHEL ISO (###Move this to a http server because with dynamic VM the scp will require keys)
-     shell: scp root@192.168.0.22:/var/lib/libvirt/images/rhel-8.7-x86_64-boot.iso "{{ microshift_local }}/generate-iso/"
+   - name: Grab RHEL ISO From HTTP Server
+     shell: wget "{{ image_source }}/{{ image_name }}" -O "{{ microshift_local }}/generate-iso/{{ image_name }}"
      become: true
        
