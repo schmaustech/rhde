@@ -282,6 +282,6 @@
      become: true
        
    - name: Grab RHEL ISO From HTTP Server
-     shell: curl "{{ image_source }}/{{ image_name }}" -O "{{ microshift_local }}/generate-iso/{{ image_name }}"
+     shell: curl "{{ image_source }}/{{ image_name }}" -o "{{ microshift_local }}/generate-iso/{{ image_name }}"
      become: true
        
