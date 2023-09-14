@@ -89,7 +89,7 @@
        msg: "UUID: {{ compose_uuid }}"
      
    - name: Check for compose to be completed
-     shell: composer-cli compose status | grep "{{ compose_uuid }}" | cut -f2 -d" "
+     shell: composer-cli compose status | grep "{{ compose_uuid }}" | awk {'print $2'}
      register: result
      become: true
      
@@ -101,7 +101,7 @@
        msg: "UUID: {{ result }}"
      
    - name: Check for compose to be completed
-     shell: composer-cli compose status | grep "{{ compose_uuid }}" | cut -f2 -d" "
+     shell: composer-cli compose status | grep "{{ compose_uuid }}" | awk {'print $2'}
      register: result
      until: '"FINISHED" in result.stdout'
      retries: 24
