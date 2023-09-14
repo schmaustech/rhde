@@ -19,10 +19,10 @@
            namespace: default
            labels:
              app: test
-             vm.kubevirt.io/template: rhel8-server-small
+             vm.kubevirt.io/template: rhel9-server-small
              vm.kubevirt.io/template.namespace: openshift
              vm.kubevirt.io/template.revision: '1'
-             vm.kubevirt.io/template.version: v0.24.2
+             vm.kubevirt.io/template.version: v0.25.0
          spec:
            dataVolumeTemplates:
              - apiVersion: cdi.kubevirt.io/v1beta1
@@ -31,10 +31,10 @@
                  creationTimestamp: null
                  name: test
                spec:
-                 source:
-                   pvc:
-                     name: rhel8-b0bacbb4e426
-                     namespace: openshift-virtualization-os-images
+                 sourceRef:
+                   kind: DataSource
+                   name: rhel9
+                   namespace: openshift-virtualization-os-images
                  storage:
                    resources:
                      requests:
@@ -44,7 +44,7 @@
              metadata:
                annotations:
                  vm.kubevirt.io/flavor: small
-                 vm.kubevirt.io/os: rhel8
+                 vm.kubevirt.io/os: rhel9
                  vm.kubevirt.io/workload: server
                creationTimestamp: null
                labels:
@@ -76,7 +76,7 @@
                    networkInterfaceMultiqueue: true
                    rng: {}
                  machine:
-                   type: pc-q35-rhel8.6.0
+                   type: pc-q35-rhel9.2.0
                  resources:
                    requests:
                      memory: 2Gi
