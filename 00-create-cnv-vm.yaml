@@ -19,7 +19,7 @@
            namespace: default
            labels:
              app: test
-             vm.kubevirt.io/template: rhel9-server-small
+             vm.kubevirt.io/template: rhel8-server-small
              vm.kubevirt.io/template.namespace: openshift
              vm.kubevirt.io/template.revision: '1'
              vm.kubevirt.io/template.version: v0.25.0
@@ -33,7 +33,7 @@
                spec:
                  sourceRef:
                    kind: DataSource
-                   name: rhel9
+                   name: rhel8
                    namespace: openshift-virtualization-os-images
                  storage:
                    resources:
@@ -44,7 +44,7 @@
              metadata:
                annotations:
                  vm.kubevirt.io/flavor: small
-                 vm.kubevirt.io/os: rhel9
+                 vm.kubevirt.io/os: rhel8
                  vm.kubevirt.io/workload: server
                creationTimestamp: null
                labels:
