@@ -10,12 +10,7 @@
        
    - name: Syncronize the local MicroShift repository
      #shell: reposync --arch=$(uname -i) --arch=noarch --gpgcheck --download-path "{{ microshift_local }}" --repo=rhocp-4.12-for-rhel-8-x86_64-rpms --repo=fast-datapath-for-rhel-8-x86_64-rpms
-     shell: curl "{{ image_source }}/repos/fast-datapath.tgz" -o "{{ microshift_local }}\fast-datapath.tgz"
-     shell: tar -xzf "{{ microshift_local }}\fast-datapath.tgz"
-     shell: rm -r -f "{{ microshift_local }}\fast-datapath.tgz"
-     shell: curl "{{ image_source }}/repos/rhocp.tgz" -o "{{ microshift_local }}\rhocp.tgz"
-     shell: tar -xzf "{{ microshift_local }}\rhocp.tgz"
-     shell: rm -r -f "{{ microshift_local }}\rhocp.tgz"
+     shell: curl "{{ image_source }}/repos/fast-datapath.tgz" -o "{{ microshift_local }}\fast-datapath.tgz";tar -xzf "{{ microshift_local }}\fast-datapath.tgz";rm -r -f "{{ microshift_local }}\fast-datapath.tgz";curl "{{ image_source }}/repos/rhocp.tgz" -o "{{ microshift_local }}\rhocp.tgz";tar -xzf "{{ microshift_local }}\rhocp.tgz";rm -r -f "{{ microshift_local }}\rhocp.tgz"
      become: true
      
    - name: Remove CoreOS packages in repository
