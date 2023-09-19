@@ -168,13 +168,13 @@
    - name: Let Controller Catch Up
      shell: sleep 60
        
-   - name: trigger {{ provisioning_template }}
-     ansible.builtin.uri:
-       url: "{{ controller_url }}/workflow_job_templates/{{ job_template_id }}/launch/"
-       method: POST
-       status_code:
-         - 201
-       body_format: json
-       body:
-         limit: "edge-{{ ipaddress | replace(':','') }}"
+   #- name: trigger {{ provisioning_template }}
+   #  ansible.builtin.uri:
+   #    url: "{{ controller_url }}/workflow_job_templates/{{ job_template_id }}/launch/"
+   #    method: POST
+   #    status_code:
+   #      - 201
+   #    body_format: json
+   #    body:
+   #      limit: "edge-{{ ipaddress | replace(':','') }}"
       
